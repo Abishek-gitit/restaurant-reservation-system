@@ -72,7 +72,13 @@ function switchCustomerSubTab(subTabId) {
   document.querySelectorAll('.sub-btn').forEach((b) => b.classList.remove('active'));
   document.querySelectorAll('.subtab-pane').forEach((p) => p.classList.remove('active'));
 
-  event.target.classList.add('active');
+  if (typeof event !== 'undefined' && event && event.target && event.target.classList && event.target.classList.contains('sub-btn')) {
+    event.target.classList.add('active');
+  } else {
+    const btn = document.querySelector(`[onclick*="${subTabId}"]`);
+    if (btn) btn.classList.add('active');
+  }
+
   const target = document.getElementById(subTabId);
   if (target) target.classList.add('active');
 
@@ -783,24 +789,25 @@ async function loadManagerDashboard() {
     // 1. Summary
     const summaryData = await authFetch(`${API_BASE}/manager/reports/summary${qStr}`);
     if (summaryData.success) {
-      const s = summaryData.data.summary;
-      document.getElementById('metricRevenue').innerText = `₹${(s.totalRevenue || 0).toFixed(2)}`;
+      const s = summaryData.data.summary || summaryData.data || {};
+      document.getElementById('metricRevenue').innerText = `₹${Number(s.totalRevenue || s.totalSales || 0).toFixed(2)}`;
       document.getElementById('metricCompleted').innerText = s.completedOrders || 0;
-      document.getElementById('metricRating').innerText = `★ ${(s.averageRating || 0).toFixed(1)}`;
-      document.getElementById('metricFeedbackCount').innerText = `${s.totalFeedback || 0} reviews`;
+      document.getElementById('metricRating').innerText = `★ ${Number(s.averageRating || 0).toFixed(1)}`;
+      document.getElementById('metricFeedbackCount').innerText = `${s.totalFeedback || s.totalReviews || s.totalReservations || 0} reviews/bookings`;
       document.getElementById('metricActiveBranches').innerText = s.activeBranches || state.branches.filter((b) => b.isActive).length;
     }
 
     // 2. Popular Dishes
     const dishesData = await authFetch(`${API_BASE}/manager/reports/popular-dishes${qStr}`);
     const dishesContainer = document.getElementById('popularDishesContainer');
-    if (dishesData.data.popularDishes?.length > 0) {
-      dishesContainer.innerHTML = dishesData.data.popularDishes
+    const dishes = dishesData.data.dishes || dishesData.data.popularDishes || [];
+    if (dishes.length > 0) {
+      dishesContainer.innerHTML = dishes
         .map(
           (d, idx) => `
         <div class="bill-row" style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
-          <span><strong>#${idx + 1} ${d.name}</strong> (${d.category})</span>
-          <span><strong>${d.totalQuantity} sold</strong> (₹${d.totalRevenue.toFixed(2)})</span>
+          <span><strong>#${idx + 1} ${d.name}</strong></span>
+          <span><strong>${d.quantitySold || d.totalQuantity || 0} sold</strong> (₹${Number(d.revenue || d.totalRevenue || 0).toFixed(2)})</span>
         </div>
       `
         )
@@ -812,13 +819,14 @@ async function loadManagerDashboard() {
     // 3. Peak Hours
     const peakData = await authFetch(`${API_BASE}/manager/reports/peak-hours${qStr}`);
     const peakContainer = document.getElementById('peakHoursContainer');
-    if (peakData.data.peakHours?.length > 0) {
-      peakContainer.innerHTML = peakData.data.peakHours
+    const peakList = peakData.data.peakHours || peakData.data.hours || [];
+    if (peakList.length > 0) {
+      peakContainer.innerHTML = peakList
         .map(
           (h) => `
         <div class="bill-row" style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
-          <span><strong>${String(h.hour).padStart(2, '0')}:00 - ${String(h.hour + 1).padStart(2, '0')}:00</strong></span>
-          <span><strong>${h.orderCount} orders</strong> (₹${h.totalRevenue.toFixed(2)})</span>
+          <span><strong>${String(h.hour).padStart(2, '0')}:00 - ${String((h.hour + 1) % 24).padStart(2, '0')}:00</strong></span>
+          <span><strong>${h.orderCount || 0} orders</strong></span>
         </div>
       `
         )
