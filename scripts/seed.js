@@ -33,10 +33,14 @@ const seedData = async (disconnectAfter = false) => {
     await Order.deleteMany({});
     await Feedback.deleteMany({});
 
-    // 1. Seed Users (4 roles)
+    // 1. Seed Users (4 roles for both @restaurant.com and @example.com)
     console.log('[Seed] Creating demo users...');
     const defaultPassword = 'Password@123';
     const passwordHash = await User.hashPassword(defaultPassword);
+    const exampleCustomerHash = await User.hashPassword('Customer@123');
+    const exampleKitchenHash = await User.hashPassword('Kitchen@123');
+    const exampleManagerHash = await User.hashPassword('Manager@123');
+    const exampleAdminHash = await User.hashPassword('Admin@123');
 
     const users = await User.create([
       {
@@ -62,9 +66,33 @@ const seedData = async (disconnectAfter = false) => {
         email: 'customer@restaurant.com',
         passwordHash,
         role: 'customer'
+      },
+      {
+        name: 'Demo Admin',
+        email: 'admin@example.com',
+        passwordHash: exampleAdminHash,
+        role: 'admin'
+      },
+      {
+        name: 'Demo Manager',
+        email: 'manager@example.com',
+        passwordHash: exampleManagerHash,
+        role: 'manager'
+      },
+      {
+        name: 'Demo Kitchen Staff',
+        email: 'kitchen@example.com',
+        passwordHash: exampleKitchenHash,
+        role: 'kitchen'
+      },
+      {
+        name: 'Demo Customer',
+        email: 'customer@example.com',
+        passwordHash: exampleCustomerHash,
+        role: 'customer'
       }
     ]);
-    console.log(`[Seed] Created ${users.length} users (admin, manager, kitchen, customer).`);
+    console.log(`[Seed] Created ${users.length} users across roles.`);
 
     // 2. Seed Branches (2 branches)
     console.log('[Seed] Creating branches...');

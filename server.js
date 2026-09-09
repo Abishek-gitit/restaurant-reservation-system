@@ -53,6 +53,15 @@ const startServer = async () => {
     // Establish database connection
     await connectDB();
 
+    // Auto-seed initial demo data if database is empty
+    const Branch = require('./models/Branch');
+    const branchCount = await Branch.countDocuments();
+    if (branchCount === 0) {
+      console.log('[Server] Database is empty. Auto-seeding initial demo data...');
+      const seedData = require('./scripts/seed');
+      await seedData(false);
+    }
+
     server = app.listen(env.port, () => {
       console.log(
         `==================================================\n` +
