@@ -208,6 +208,15 @@ async function authFetch(url, options = {}) {
   const response = await fetch(url, { ...options, headers });
   const data = await response.json();
   if (!response.ok) {
+    if (response.status === 401) {
+      state.token = null;
+      state.user = null;
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      updateAuthUI();
+      const authSection = document.getElementById('authSection');
+      if (authSection) authSection.classList.remove('hidden');
+    }
     const error = new Error(data.message || 'Request failed');
     error.status = response.status;
     error.data = data;
