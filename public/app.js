@@ -720,7 +720,7 @@ async function loadKitchenQueue() {
     grid.innerHTML = orders
       .map((o) => {
         const orderId = o.id || o._id;
-        const branchName = o.branchId?.name || 'Branch';
+        const branchName = o.branch || o.branchId?.name || 'Branch';
         const orderTypeBadge = o.orderType === 'DINE_IN' ? 'Dine-In' : 'Takeaway';
         const nextStatus = o.status === 'PLACED' ? 'PREPARING' : 'READY';
 

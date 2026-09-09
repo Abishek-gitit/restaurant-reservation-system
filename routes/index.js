@@ -13,6 +13,28 @@ const { successResponse } = require('../utils/apiResponse');
 
 const router = express.Router();
 
+// API Root Overview
+router.get('/', (req, res) => {
+  return successResponse(res, 200, 'RestoHub REST API Root', {
+    system: 'Restaurant Table Reservation & Food Ordering System',
+    version: '1.0.0 (CIA-3 Submission)',
+    webPortal: 'http://localhost:5001/',
+    health: '/api/health',
+    modules: {
+      auth: '/api/auth',
+      branches: '/api/branches',
+      menu: '/api/menu',
+      tables: '/api/tables',
+      reservations: '/api/reservations',
+      orders: '/api/orders',
+      kitchen: '/api/kitchen',
+      customers: '/api/customers',
+      feedback: '/api/feedback',
+      reports: '/api/manager/reports'
+    }
+  });
+});
+
 // Health Check API
 router.get('/health', (req, res) => {
   return successResponse(res, 200, 'Restaurant API is running', {
