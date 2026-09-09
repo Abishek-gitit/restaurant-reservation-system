@@ -1,5 +1,5 @@
-# Restaurant Table Reservation & Food Ordering System (Phase 5 — Final Submission)
-**Course:** 5th Semester B.Tech (Computer Science & Engineering) — CIA-3  
+# Restaurant Table Reservation & Food Ordering System
+**Course:** 5th Semester B.Tech — Continuous Internal Assessment (CIA-3)  
 **Institution:** Christ University  
 **Technology Stack:** Node.js, Express.js, MongoDB, Mongoose, JWT, bcrypt, HTML5/CSS3/Vanilla JS  
 
@@ -590,16 +590,20 @@ A complete, academic-grade Postman collection and environment are provided in `p
 ---
 
 ## 15. Comprehensive Documentation Directory (`docs/`)
-All technical specifications, evaluation materials, presentation slides, and viva guides are compiled in `docs/`:
-* [`docs/architecture.md`](file:///Users/abishekks/Desktop/LNT/docs/architecture.md): MVC design, component diagrams, middleware pipeline, and error handling flow.
+All technical specifications, academic evaluation materials, presentation slide decks, and viva guides are compiled in `docs/`:
+* [`docs/architecture.md`](file:///Users/abishekks/Desktop/LNT/docs/architecture.md): 3-tier MVC design, component diagrams, middleware pipeline, and error handling flow.
 * [`docs/database-design.md`](file:///Users/abishekks/Desktop/LNT/docs/database-design.md): Complete ER diagram, schema attributes, indexing matrix, and embedding vs. referencing rationale.
 * [`docs/api-documentation.md`](file:///Users/abishekks/Desktop/LNT/docs/api-documentation.md): 30+ REST endpoints, parameters, envelopes, and error code dictionary.
 * [`docs/business-rules.md`](file:///Users/abishekks/Desktop/LNT/docs/business-rules.md): Mathematical conflict formula, 2-hour cancellation rule, state machine table, and billing equations.
 * [`docs/testing.md`](file:///Users/abishekks/Desktop/LNT/docs/testing.md): Automated testing matrix with 149 verified test assertions.
-* [`docs/demo-runbook.md`](file:///Users/abishekks/Desktop/LNT/docs/demo-runbook.md): Step-by-step 7–10 minute live presentation runbook.
-* [`docs/viva-questions.md`](file:///Users/abishekks/Desktop/LNT/docs/viva-questions.md): 28 curated viva questions and authoritative answers covering MongoDB, Node.js, and security.
-* [`docs/PPT_CONTENT.md`](file:///Users/abishekks/Desktop/LNT/docs/PPT_CONTENT.md): 12 presentation slides tailored for 5th-semester project evaluation.
-* [`docs/REPORT_CONTENT.md`](file:///Users/abishekks/Desktop/LNT/docs/REPORT_CONTENT.md): 20-section comprehensive academic project report.
+* [`docs/demo-runbook.md`](file:///Users/abishekks/Desktop/LNT/docs/demo-runbook.md): Step-by-step live presentation runbook.
+* [`docs/FINAL_REPORT.md`](file:///Users/abishekks/Desktop/LNT/docs/FINAL_REPORT.md): 22-section comprehensive academic project report conforming to university standards.
+* [`docs/FINAL_PPT.md`](file:///Users/abishekks/Desktop/LNT/docs/FINAL_PPT.md): 14 academic presentation slides tailored for CIA-3 project evaluation.
+* [`docs/FINAL_DEMO_SCRIPT.md`](file:///Users/abishekks/Desktop/LNT/docs/FINAL_DEMO_SCRIPT.md): Rehearsed 7–10 minute live demonstration script with exact speaker dialogue and action cues.
+* [`docs/FINAL_VIVA_PREPARATION.md`](file:///Users/abishekks/Desktop/LNT/docs/FINAL_VIVA_PREPARATION.md): 35 comprehensive viva questions and authoritative answers across 8 technical domains.
+* [`docs/DEMO_BACKUP_PLAN.md`](file:///Users/abishekks/Desktop/LNT/docs/DEMO_BACKUP_PLAN.md): Emergency contingency plan for zero-downtime recovery during offline/database failure.
+* [`docs/SCREENSHOT_CHECKLIST.md`](file:///Users/abishekks/Desktop/LNT/docs/SCREENSHOT_CHECKLIST.md): 25-scenario visual evidence checklist for user, kitchen, manager, and API actions.
+* [`docs/SUBMISSION_CHECKLIST.md`](file:///Users/abishekks/Desktop/LNT/docs/SUBMISSION_CHECKLIST.md): Final academic compliance and submission sign-off checklist.
 
 ---
 
@@ -607,10 +611,10 @@ All technical specifications, evaluation materials, presentation slides, and viv
 
 | Role | Email | Password | Scope |
 | :--- | :--- | :--- | :--- |
-| **Customer** | `customer@example.com` | `Customer@123` | Table reservations, food orders, personal history, feedback |
-| **Kitchen Staff** | `kitchen@example.com` | `Kitchen@123` | Kitchen display FIFO queue, order status advancement |
-| **Manager** | `manager@example.com` | `Manager@123` | Executive analytics, sales summaries, branch operations |
-| **Admin** | `admin@example.com` | `Admin@123` | Global system administration & full CRUD oversight |
+| **Customer** | `customer@example.com` / `customer@restaurant.com` | `Customer@123` / `Password@123` | Table reservations, food orders, personal history, feedback |
+| **Kitchen Staff** | `kitchen@example.com` / `kitchen@restaurant.com` | `Kitchen@123` / `Password@123` | Kitchen display FIFO queue, order status advancement |
+| **Manager** | `manager@example.com` / `manager@restaurant.com` | `Manager@123` / `Password@123` | Executive analytics, sales summaries, branch operations |
+| **Admin** | `admin@example.com` / `admin@restaurant.com` | `Admin@123` / `Password@123` | Global system administration & full CRUD oversight |
 
 ---
 
@@ -634,12 +638,11 @@ All technical specifications, evaluation materials, presentation slides, and viv
 
 ---
 
-## 18. Project Team Members & Academic Attribution
-* **Institution:** Christ University, Department of Computer Science & Engineering
-* **Course:** 5th Semester B.Tech (CSE) — Continuous Internal Assessment (CIA-3)
-* **Team Members:**
-  - *Student 1:* [Name Placeholder] — [Register Number Placeholder]
-  - *Student 2:* [Name Placeholder] — [Register Number Placeholder]
-* **Project Guide:** Department Faculty, School of Engineering and Technology
+## 18. Academic Context & Disclaimer
+* **Course:** 5th Semester B.Tech — Continuous Internal Assessment (CIA-3)
+* **Institution:** Christ University
+* **Project Status:** Complete, 100% Tested (149/149 Assertions Passed, 0 Failures)
+* **Academic Purpose:** This repository has been developed and submitted strictly for academic assessment, live demonstration, and viva voce evaluation.
+
 
 

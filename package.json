@@ -1,7 +1,7 @@
 {
   "name": "restaurant-reservation-backend",
   "version": "1.0.0",
-  "description": "Restaurant Table Reservation & Food Ordering System - Phase 1 Backend",
+  "description": "Restaurant Table Reservation & Food Ordering System - Academic Project (Christ University CIA-3)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
