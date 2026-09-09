@@ -283,7 +283,7 @@ async function loadMenu() {
     const res = await fetch(`${API_BASE}/menu?branchId=${state.selectedBranchId}`);
     const data = await res.json();
     if (data.success) {
-      state.menuItems = data.data.items || [];
+      state.menuItems = data.data.menuItems || data.data.items || [];
       renderMenu();
     }
   } catch (err) {

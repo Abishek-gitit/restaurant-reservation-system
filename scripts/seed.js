@@ -192,9 +192,30 @@ const seedData = async (disconnectAfter = false) => {
       },
       {
         branchId: kengeriBranch._id,
+        name: 'Crispy Corn Pepper Salt',
+        category: 'Starters',
+        price: 180,
+        isAvailable: true
+      },
+      {
+        branchId: kengeriBranch._id,
         name: 'Dal Makhani Bukhara',
         category: 'Main Course',
         price: 250,
+        isAvailable: true
+      },
+      {
+        branchId: kengeriBranch._id,
+        name: 'Kadhai Paneer Special',
+        category: 'Main Course',
+        price: 290,
+        isAvailable: true
+      },
+      {
+        branchId: kengeriBranch._id,
+        name: 'Chicken Tikka Biryani',
+        category: 'Main Course',
+        price: 340,
         isAvailable: true
       },
       {
@@ -206,9 +227,23 @@ const seedData = async (disconnectAfter = false) => {
       },
       {
         branchId: kengeriBranch._id,
+        name: 'Royal Rasmalai (2 Pcs)',
+        category: 'Desserts',
+        price: 160,
+        isAvailable: true
+      },
+      {
+        branchId: kengeriBranch._id,
         name: 'Fresh Mint Lime Soda',
         category: 'Beverages',
         price: 90,
+        isAvailable: true
+      },
+      {
+        branchId: kengeriBranch._id,
+        name: 'Masala Spiced Chai',
+        category: 'Beverages',
+        price: 60,
         isAvailable: true
       }
     ]);
