@@ -27,14 +27,14 @@ router
   .route('/:id/status')
   .put(
     auth,
-    authorize('manager', 'kitchen', 'admin'),
+    authorize('manager', 'kitchen', 'admin', 'customer'),
     validate(idParamSchema, 'params'),
     validate(updateOrderStatusSchema),
     orderController.updateOrderStatus
   )
   .patch(
     auth,
-    authorize('manager', 'kitchen', 'admin'),
+    authorize('manager', 'kitchen', 'admin', 'customer'),
     validate(idParamSchema, 'params'),
     validate(updateOrderStatusSchema),
     orderController.updateOrderStatus

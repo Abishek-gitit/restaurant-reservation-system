@@ -3,356 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RestoHub — Table Reservation & Food Ordering System</title>
+  <title>RestoHub — Restaurant Management System</title>
+  <meta name="description" content="RestoHub: Role-based restaurant management for customers, kitchen staff, and managers.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Header / Navigation -->
-  <header class="navbar">
-    <div class="nav-container">
-      <div class="brand">
-        <span class="logo-icon">🍽️</span>
-        <div>
-          <span class="brand-title">RestoHub</span>
-          <span class="brand-subtitle">5th Sem CIA-3 Project</span>
-        </div>
-      </div>
-
-      <nav class="nav-links" id="navLinks">
-        <button class="nav-btn active" data-tab="customerTab" id="navCustomerBtn">Customer Portal</button>
-        <button class="nav-btn" data-tab="kitchenTab" id="navKitchenBtn">Kitchen Display</button>
-        <button class="nav-btn" data-tab="managerTab" id="navManagerBtn">Manager Dashboard</button>
-      </nav>
-
-      <div class="user-profile" id="userProfile">
-        <!-- Injected dynamically: User pill or Login button -->
-      </div>
-    </div>
-  </header>
-
-  <!-- Notification Toast Container -->
+  <!-- Toast Notifications -->
   <div id="toastContainer" class="toast-container"></div>
 
-  <!-- Main Content Wrapper -->
-  <main class="main-container">
-    
-    <!-- AUTH MODAL / VIEW (When not logged in or switching accounts) -->
-    <section id="authSection" class="auth-section card hidden">
-      <div class="auth-header">
-        <h2 id="authTitle">Sign In to RestoHub</h2>
-        <p class="text-muted">Choose a quick demo account or enter your credentials</p>
-      </div>
-
-      <!-- Quick Demo Account Fillers -->
-      <div class="demo-pills">
-        <span class="demo-label">Quick Demo Logins:</span>
-        <button class="pill-btn customer" onclick="quickFill('customer@example.com', 'Customer@123')">Customer</button>
-        <button class="pill-btn kitchen" onclick="quickFill('kitchen@example.com', 'Kitchen@123')">Kitchen Staff</button>
-        <button class="pill-btn manager" onclick="quickFill('manager@example.com', 'Manager@123')">Manager</button>
-        <button class="pill-btn admin" onclick="quickFill('admin@example.com', 'Admin@123')">Admin</button>
-      </div>
-
-      <form id="authForm" class="auth-form" onsubmit="handleAuthSubmit(event)">
-        <div class="form-group" id="nameGroup" style="display: none;">
-          <label for="authName">Full Name</label>
-          <input type="text" id="authName" placeholder="John Doe">
-        </div>
-        <div class="form-group">
-          <label for="authEmail">Email Address</label>
-          <input type="email" id="authEmail" required placeholder="user@example.com">
-        </div>
-        <div class="form-group">
-          <label for="authPassword">Password</label>
-          <input type="password" id="authPassword" required placeholder="••••••••">
-        </div>
-        <div class="form-group" id="phoneGroup" style="display: none;">
-          <label for="authPhone">Phone Number</label>
-          <input type="text" id="authPhone" placeholder="+91 9876543210">
-        </div>
-        <button type="submit" id="authSubmitBtn" class="btn btn-primary w-100">Sign In</button>
-      </form>
-
-      <div class="auth-toggle">
-        <span id="authToggleText">Don't have an account?</span>
-        <button type="button" class="link-btn" id="authToggleBtn" onclick="toggleAuthMode()">Create one here</button>
-      </div>
-    </section>
-
-    <!-- CUSTOMER TAB -->
-    <section id="customerTab" class="tab-pane active">
-      <!-- Branch Selector & Status Strip -->
-      <div class="branch-strip card">
-        <div class="branch-info">
-          <span class="label">Select Branch:</span>
-          <select id="branchSelect" class="form-select" onchange="onBranchChange()">
-            <option value="">Loading branches...</option>
-          </select>
-          <span id="branchStatusBadge" class="badge badge-success">Active</span>
-        </div>
-        <div class="branch-meta" id="branchMeta">
-          <span>Capacity: <strong id="branchCapacity">—</strong></span>
-          <span>Address: <strong id="branchAddress">—</strong></span>
-        </div>
-      </div>
-
-      <!-- Quick Action Navigation inside Customer Portal -->
-      <div class="sub-nav">
-        <button class="sub-btn active" onclick="switchCustomerSubTab('menuSubTab')">Menu & Food Ordering</button>
-        <button class="sub-btn" onclick="switchCustomerSubTab('reservationSubTab')">Table Reservations</button>
-        <button class="sub-btn" onclick="switchCustomerSubTab('ordersSubTab')">My Orders & Bills</button>
-        <button class="sub-btn" onclick="switchCustomerSubTab('historySubTab')">Reservation History</button>
-      </div>
-
-      <!-- Subtab 1: Menu & Ordering -->
-      <div id="menuSubTab" class="subtab-pane active">
-        <div class="menu-layout">
-          <!-- Left: Menu List -->
-          <div class="menu-section card">
-            <div class="section-header">
-              <h3>Branch Menu</h3>
-              <div class="category-filters" id="categoryFilters">
-                <button class="filter-btn active" onclick="filterMenu('ALL')">All</button>
-                <button class="filter-btn" onclick="filterMenu('Starters')">Starters</button>
-                <button class="filter-btn" onclick="filterMenu('Main Course')">Main Course</button>
-                <button class="filter-btn" onclick="filterMenu('Desserts')">Desserts</button>
-                <button class="filter-btn" onclick="filterMenu('Beverages')">Beverages</button>
-              </div>
-            </div>
-            <div id="menuGrid" class="menu-grid">
-              <div class="empty-state">Select an active branch to explore delicious dishes.</div>
-            </div>
-          </div>
-
-          <!-- Right: Cart / Order Preview -->
-          <div class="cart-section card">
-            <h3>Your Order</h3>
-            <div class="order-type-selector">
-              <label class="radio-label">
-                <input type="radio" name="orderType" value="DINE_IN" checked onchange="updateCartUI()">
-                <span>Dine In</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="orderType" value="TAKEAWAY" onchange="updateCartUI()">
-                <span>Takeaway</span>
-              </label>
-            </div>
-
-            <div id="dineInTableSelectGroup" class="form-group mt-2">
-              <label for="cartTableSelect">Select Table:</label>
-              <select id="cartTableSelect" class="form-select">
-                <option value="">Choose a table...</option>
-              </select>
-            </div>
-
-            <div id="cartItemsList" class="cart-items">
-              <div class="empty-cart text-muted">No items in your cart.</div>
-            </div>
-
-            <div class="bill-breakdown">
-              <div class="bill-row"><span>Subtotal:</span><strong id="billSubtotal">₹0.00</strong></div>
-              <div class="bill-row"><span>Tax (5%):</span><span id="billTax">₹0.00</span></div>
-              <div class="bill-row"><span>Service Charge (5%):</span><span id="billServiceCharge">₹0.00</span></div>
-              <div class="bill-row grand-total"><span>Grand Total:</span><strong id="billTotal">₹0.00</strong></div>
-            </div>
-
-            <button id="placeOrderBtn" class="btn btn-primary w-100 mt-3" onclick="handlePlaceOrder()" disabled>
-              Place Food Order
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Subtab 2: Reservations -->
-      <div id="reservationSubTab" class="subtab-pane">
-        <div class="grid-2-col">
-          <!-- Reservation Form -->
-          <div class="card">
-            <h3>Book a Table</h3>
-            <p class="text-muted">Instant confirmation with conflict prevention engine.</p>
-            <form id="reservationForm" onsubmit="handleCreateReservation(event)">
-              <div class="form-group">
-                <label>Select Table</label>
-                <select id="reserveTableSelect" class="form-select" required>
-                  <option value="">Select table...</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Reservation Date & Time</label>
-                <input type="datetime-local" id="reserveDateTime" class="form-control" required>
-              </div>
-              <div class="form-group">
-                <label>Duration (Minutes)</label>
-                <select id="reserveDuration" class="form-select">
-                  <option value="60">60 minutes</option>
-                  <option value="90">90 minutes</option>
-                  <option value="120" selected>120 minutes (Standard)</option>
-                  <option value="180">180 minutes</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Number of Guests</label>
-                <input type="number" id="reserveGuests" class="form-control" min="1" max="20" value="2" required>
-              </div>
-              <div class="form-group">
-                <label>Special Requests (Optional)</label>
-                <input type="text" id="reserveRequests" class="form-control" placeholder="Window view, quiet corner, etc.">
-              </div>
-              <button type="submit" class="btn btn-primary w-100">Confirm Reservation</button>
-            </form>
-          </div>
-
-          <!-- Branch Tables Overview -->
-          <div class="card">
-            <h3>Tables Available at Branch</h3>
-            <div id="branchTablesGrid" class="tables-grid">
-              <div class="empty-state">Select a branch to see table capacities.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Subtab 3: Customer Orders & Billing -->
-      <div id="ordersSubTab" class="subtab-pane">
-        <div class="card">
-          <div class="section-header">
-            <h3>My Orders</h3>
-            <button class="btn btn-secondary btn-sm" onclick="loadCustomerOrders()">Refresh</button>
-          </div>
-          <div id="customerOrdersContainer" class="orders-list">
-            <div class="empty-state">No orders placed yet.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Subtab 4: Customer Reservation History -->
-      <div id="historySubTab" class="subtab-pane">
-        <div class="card">
-          <div class="section-header">
-            <h3>My Reservations</h3>
-            <button class="btn btn-secondary btn-sm" onclick="loadCustomerReservations()">Refresh</button>
-          </div>
-          <div id="customerReservationsContainer" class="reservations-list">
-            <div class="empty-state">No reservations found.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- KITCHEN DISPLAY QUEUE TAB -->
-    <section id="kitchenTab" class="tab-pane">
-      <div class="card">
-        <div class="section-header">
-          <div>
-            <h2>Kitchen Display Queue (KDS)</h2>
-            <p class="text-muted">FIFO order workflow: PLACED → PREPARING → READY → SERVED / DELIVERED</p>
-          </div>
-          <div class="kitchen-controls">
-            <select id="kitchenBranchSelect" class="form-select" onchange="loadKitchenQueue()">
-              <option value="">All Branches</option>
-            </select>
-            <button class="btn btn-secondary" onclick="loadKitchenQueue()">Refresh Queue</button>
-          </div>
-        </div>
-
-        <div id="kitchenQueueGrid" class="kitchen-grid mt-3">
-          <div class="empty-state">Kitchen queue is clear!</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- MANAGER DASHBOARD TAB -->
-    <section id="managerTab" class="tab-pane">
-      <div class="dashboard-controls mb-3">
-        <div class="branch-filter">
-          <label>Filter Branch:</label>
-          <select id="managerBranchSelect" class="form-select" onchange="loadManagerDashboard()">
-            <option value="">All Branches</option>
-          </select>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="loadManagerDashboard()">Refresh Analytics</button>
-      </div>
-
-      <!-- Analytics Metric Cards -->
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-title">Total Revenue</div>
-          <div class="metric-value" id="metricRevenue">₹0.00</div>
-          <div class="metric-subtitle">From completed orders</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Completed Orders</div>
-          <div class="metric-value" id="metricCompleted">0</div>
-          <div class="metric-subtitle">SERVED & DELIVERED</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Average Rating</div>
-          <div class="metric-value" id="metricRating">★ 0.0</div>
-          <div class="metric-subtitle" id="metricFeedbackCount">0 reviews</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">Active Branches</div>
-          <div class="metric-value" id="metricActiveBranches">0</div>
-          <div class="metric-subtitle">Operational units</div>
-        </div>
-      </div>
-
-      <div class="grid-2-col mt-4">
-        <!-- Popular Dishes -->
-        <div class="card">
-          <h3>Top Selling Dishes</h3>
-          <div id="popularDishesContainer" class="report-list">
-            <div class="empty-state">No sales data available.</div>
-          </div>
-        </div>
-
-        <!-- Peak Hours -->
-        <div class="card">
-          <h3>Peak Ordering Hours</h3>
-          <div id="peakHoursContainer" class="report-list">
-            <div class="empty-state">No hourly data available.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Branch Management -->
-      <div class="card mt-4">
-        <h3>Branch Management & Status Controls</h3>
-        <p class="text-muted">Deactivated branches immediately reject new reservations and food orders.</p>
-        <div id="managerBranchesList" class="branches-table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Branch Name</th>
-                <th>Address</th>
-                <th>Capacity</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="managerBranchesTbody">
-              <tr><td colspan="5" class="text-center">Loading branches...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- FEEDBACK MODAL -->
+  <!-- Feedback Modal (shared across views) -->
   <div id="feedbackModal" class="modal-overlay hidden">
     <div class="modal card">
       <div class="modal-header">
-        <h3>Submit Experience Rating</h3>
+        <h3>Rate Your Experience</h3>
         <button class="close-btn" onclick="closeFeedbackModal()">×</button>
       </div>
       <form id="feedbackForm" onsubmit="handleFeedbackSubmit(event)">
         <input type="hidden" id="feedbackOrderId">
         <input type="hidden" id="feedbackBranchId">
-        
         <div class="form-group">
           <label>Rating (1 to 5 Stars)</label>
           <div class="star-rating">
@@ -363,12 +34,10 @@
             <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
           </div>
         </div>
-
         <div class="form-group">
           <label for="feedbackComment">Your Feedback (Optional)</label>
           <textarea id="feedbackComment" class="form-control" rows="3" placeholder="Tell us about the food quality and service..."></textarea>
         </div>
-
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary" onclick="closeFeedbackModal()">Cancel</button>
           <button type="submit" class="btn btn-primary">Submit Feedback</button>
@@ -377,6 +46,14 @@
     </div>
   </div>
 
-  <script src="app.js?v=4"></script>
+  <!-- Root App Mount Point — all UI is rendered here by app.js -->
+  <div id="app">
+    <div class="app-loading">
+      <div class="loading-spinner"></div>
+      <p>Loading RestoHub...</p>
+    </div>
+  </div>
+
+  <script src="app.js?v=5"></script>
 </body>
 </html>

@@ -33,6 +33,12 @@ router
     validate(idParamSchema, 'params'),
     validate(cancelReservationSchema),
     reservationController.cancelReservation
+  )
+  .patch(
+    auth,
+    validate(idParamSchema, 'params'),
+    validate(cancelReservationSchema),
+    reservationController.cancelReservation
   );
 
 router
