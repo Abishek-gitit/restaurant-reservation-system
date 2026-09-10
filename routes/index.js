@@ -9,6 +9,7 @@ const customerRoutes = require('./customerRoutes');
 const kitchenRoutes = require('./kitchenRoutes');
 const feedbackRoutes = require('./feedbackRoutes');
 const reportRoutes = require('./reportRoutes');
+const userRoutes = require('./userRoutes');
 const { successResponse } = require('../utils/apiResponse');
 
 const router = express.Router();
@@ -30,7 +31,8 @@ router.get('/', (req, res) => {
       kitchen: '/api/kitchen',
       customers: '/api/customers',
       feedback: '/api/feedback',
-      reports: '/api/manager/reports'
+      reports: '/api/manager/reports',
+      users: '/api/users'
     }
   });
 });
@@ -54,5 +56,6 @@ router.use('/customers', customerRoutes);
 router.use('/kitchen', kitchenRoutes);
 router.use('/feedback', feedbackRoutes);
 router.use('/manager/reports', reportRoutes);
+router.use('/users', userRoutes);
 
 module.exports = router;

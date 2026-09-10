@@ -64,7 +64,7 @@ const ROLE_ALLOWED_PATHS = {
   customer: ['#/customer'],
   kitchen:  ['#/kitchen'],
   manager:  ['#/manager', '#/manager/orders', '#/manager/menu', '#/manager/reservations', '#/manager/branches'],
-  admin:    ['#/manager', '#/manager/orders', '#/manager/menu', '#/manager/reservations', '#/manager/branches']
+  admin:    ['#/manager', '#/manager/orders', '#/manager/menu', '#/manager/reservations', '#/manager/branches', '#/manager/staff']
 };
 
 function navigate(hash) {
@@ -229,6 +229,7 @@ function renderKitchenNav() {
 }
 
 function renderManagerNav(activeTab) {
+  const isAdmin = state.user && state.user.role === 'admin';
   const tabs = [
     { id: 'analytics',    icon: '📊', label: 'Analytics' },
     { id: 'orders',       icon: '📋', label: 'Orders' },
@@ -236,14 +237,23 @@ function renderManagerNav(activeTab) {
     { id: 'reservations', icon: '📅', label: 'Reservations' },
     { id: 'branches',     icon: '🏪', label: 'Branches' }
   ];
+
+  if (isAdmin) {
+    tabs.push({ id: 'staff', icon: '👥', label: 'Staff' });
+  }
+
+  const title = isAdmin ? 'Admin Dashboard' : 'Manager Dashboard';
+  const logo = isAdmin ? '⚙️' : '📊';
+  const roleBadgeClass = isAdmin ? 'role-badge badge-admin' : 'role-badge';
+
   return `
-    <header class="navbar navbar-manager">
+    <header class="navbar navbar-manager ${isAdmin ? 'navbar-admin' : ''}">
       <div class="nav-container">
         <div class="brand">
-          <span class="logo-icon">📊</span>
+          <span class="logo-icon">${logo}</span>
           <div>
             <span class="brand-title">RestoHub</span>
-            <span class="brand-subtitle">Manager Dashboard</span>
+            <span class="brand-subtitle">${title}</span>
           </div>
         </div>
         <nav class="nav-links">
@@ -255,7 +265,7 @@ function renderManagerNav(activeTab) {
         <div class="user-profile">
           <div class="user-pill">
             <span>🏢 ${state.user.name || state.user.email}</span>
-            <span class="role-badge">${state.user.role}</span>
+            <span class="${roleBadgeClass}">${state.user.role}</span>
           </div>
           <button class="btn btn-sm btn-secondary" onclick="logout()">Logout</button>
         </div>
@@ -1161,6 +1171,7 @@ async function advanceOrderStatus(orderId, nextStatus) {
 // ============================================================
 function renderManagerDashboard() {
   state.managerSubTab = state.managerSubTab || 'analytics';
+  const isAdmin = state.user && state.user.role === 'admin';
   const app = document.getElementById('app');
   app.innerHTML = `
     ${renderManagerNav(state.managerSubTab)}
@@ -1253,7 +1264,10 @@ function renderManagerDashboard() {
           <div class="card">
             <div class="section-header">
               <h3>Menu Items</h3>
-              <button class="btn btn-sm btn-secondary" onclick="loadManagerMenu()">↻ Refresh</button>
+              <div style="display:flex;gap:0.5rem;align-items:center">
+                ${isAdmin ? `<button class="btn btn-sm btn-primary" onclick="openAddMenuModal()">＋ Add Menu Item</button>` : ''}
+                <button class="btn btn-sm btn-secondary" onclick="loadManagerMenu()">↻ Refresh</button>
+              </div>
             </div>
             <div id="managerMenuContainer">
               <div class="text-muted">Loading menu...</div>
@@ -1277,8 +1291,13 @@ function renderManagerDashboard() {
         <!-- Branches Tab -->
         <div id="managerTab-branches" class="subtab-pane ${state.managerSubTab==='branches'?'active':''}">
           <div class="card">
-            <h3>Branch Management</h3>
-            <p class="text-muted mt-2">Deactivated branches immediately reject new reservations and orders.</p>
+            <div class="section-header">
+              <div>
+                <h3>Branch Management</h3>
+                <p class="text-muted mt-1">Deactivated branches immediately reject new reservations and orders.</p>
+              </div>
+              ${isAdmin ? `<button class="btn btn-sm btn-primary" onclick="openAddBranchModal()">＋ Add New Branch</button>` : ''}
+            </div>
             <div class="branches-table-container mt-3">
               <table class="data-table">
                 <thead>
@@ -1298,6 +1317,38 @@ function renderManagerDashboard() {
           </div>
         </div>
 
+        <!-- Staff Management Tab (Admin Only) -->
+        ${isAdmin ? `
+        <div id="managerTab-staff" class="subtab-pane ${state.managerSubTab==='staff'?'active':''}">
+          <div class="card">
+            <div class="section-header">
+              <div>
+                <h3>👥 Staff & User Accounts</h3>
+                <p class="text-muted mt-1">Manage system administrators, managers, and kitchen staff.</p>
+              </div>
+              <div style="display:flex;gap:0.5rem">
+                <button class="btn btn-sm btn-primary" onclick="openAddUserModal()">＋ Add Staff Member</button>
+                <button class="btn btn-sm btn-secondary" onclick="loadManagerUsers()">↻ Refresh</button>
+              </div>
+            </div>
+            <div id="managerUsersContainer" class="mt-3">
+              <div class="text-muted">Loading staff accounts...</div>
+            </div>
+          </div>
+        </div>
+        ` : ''}
+
+      </div>
+    </div>
+
+    <!-- Admin Modals -->
+    <div id="adminModalOverlay" class="modal-overlay" style="display:none">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="adminModalTitle">Admin Action</h3>
+          <button class="close-btn" onclick="closeAdminModal()">✕</button>
+        </div>
+        <div id="adminModalBody" class="modal-body"></div>
       </div>
     </div>`;
 
@@ -1322,6 +1373,7 @@ function reloadManagerTab() {
   if (tab === 'menu')         loadManagerMenu();
   if (tab === 'reservations') loadManagerReservations();
   if (tab === 'branches')     loadManagerBranches();
+  if (tab === 'staff')        loadManagerUsers();
 }
 
 async function loadManagerDashboard() {
@@ -1518,6 +1570,226 @@ async function toggleBranchStatus(branchId, newStatus) {
     showToast(`Branch ${newStatus ? 'activated' : 'deactivated'} ✓`, 'success');
     await loadBranches();
     loadManagerBranches();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+// ============================================================
+// ADMIN MANAGEMENT (STAFF, BRANCHES, MENU MODALS)
+// ============================================================
+
+async function loadManagerUsers() {
+  const container = document.getElementById('managerUsersContainer');
+  if (!container) return;
+  container.innerHTML = '<div class="text-muted">Loading staff accounts...</div>';
+  try {
+    const data = await authFetch(`${API_BASE}/users`);
+    const users = data.data.users || [];
+    if (users.length === 0) {
+      container.innerHTML = '<div class="empty-state">No staff accounts found.</div>';
+      return;
+    }
+    const roleBadges = {
+      admin: '<span class="badge badge-admin">admin</span>',
+      manager: '<span class="badge badge-info">manager</span>',
+      kitchen: '<span class="badge badge-warning">kitchen</span>',
+      customer: '<span class="badge badge-secondary">customer</span>'
+    };
+    container.innerHTML = `
+      <table class="data-table">
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Role</th><th>Registered</th></tr>
+        </thead>
+        <tbody>
+          ${users.map(u => `
+            <tr>
+              <td><strong>${u.name}</strong></td>
+              <td>${u.email}</td>
+              <td>${roleBadges[u.role] || u.role}</td>
+              <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch (err) {
+    if (container) container.innerHTML = `<div class="text-muted">Error: ${err.message}</div>`;
+  }
+}
+
+function closeAdminModal() {
+  const overlay = document.getElementById('adminModalOverlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function openAddUserModal() {
+  const overlay = document.getElementById('adminModalOverlay');
+  const title = document.getElementById('adminModalTitle');
+  const body = document.getElementById('adminModalBody');
+  if (!overlay || !body) return;
+
+  title.innerText = '👥 Register Staff Member';
+  body.innerHTML = `
+    <form onsubmit="handleCreateUser(event)">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="newUserName" class="form-control" required placeholder="e.g. Alex Smith">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="newUserEmail" class="form-control" required placeholder="e.g. alex@restaurant.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="newUserPassword" class="form-control" required placeholder="••••••••">
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="newUserRole" class="form-select" required>
+          <option value="manager">Manager</option>
+          <option value="kitchen">Kitchen Staff</option>
+          <option value="admin">System Admin</option>
+        </select>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:0.5rem;margin-top:1.5rem">
+        <button type="button" class="btn btn-secondary" onclick="closeAdminModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Account</button>
+      </div>
+    </form>`;
+
+  overlay.style.display = 'flex';
+}
+
+async function handleCreateUser(e) {
+  e.preventDefault();
+  const name = document.getElementById('newUserName').value.trim();
+  const email = document.getElementById('newUserEmail').value.trim();
+  const password = document.getElementById('newUserPassword').value;
+  const role = document.getElementById('newUserRole').value;
+
+  try {
+    await authFetch(`${API_BASE}/users`, {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password, role })
+    });
+    showToast(`Created ${role} account for ${name} 🎉`, 'success');
+    closeAdminModal();
+    loadManagerUsers();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+function openAddBranchModal() {
+  const overlay = document.getElementById('adminModalOverlay');
+  const title = document.getElementById('adminModalTitle');
+  const body = document.getElementById('adminModalBody');
+  if (!overlay || !body) return;
+
+  title.innerText = '🏪 Add New Branch';
+  body.innerHTML = `
+    <form onsubmit="handleCreateBranch(event)">
+      <div class="form-group">
+        <label>Branch Name</label>
+        <input type="text" id="newBranchName" class="form-control" required placeholder="e.g. Indiranagar Outlet">
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" id="newBranchAddress" class="form-control" required placeholder="e.g. 12th Main Road, Indiranagar">
+      </div>
+      <div class="form-group">
+        <label>Seating Capacity</label>
+        <input type="number" id="newBranchCapacity" class="form-control" min="1" max="500" value="50" required>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:0.5rem;margin-top:1.5rem">
+        <button type="button" class="btn btn-secondary" onclick="closeAdminModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Branch</button>
+      </div>
+    </form>`;
+
+  overlay.style.display = 'flex';
+}
+
+async function handleCreateBranch(e) {
+  e.preventDefault();
+  const name = document.getElementById('newBranchName').value.trim();
+  const address = document.getElementById('newBranchAddress').value.trim();
+  const seatingCapacity = Number(document.getElementById('newBranchCapacity').value);
+
+  try {
+    await authFetch(`${API_BASE}/branches`, {
+      method: 'POST',
+      body: JSON.stringify({ name, address, seatingCapacity })
+    });
+    showToast(`Branch "${name}" created successfully 🎉`, 'success');
+    closeAdminModal();
+    await loadBranches();
+    loadManagerBranches();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+function openAddMenuModal() {
+  const overlay = document.getElementById('adminModalOverlay');
+  const title = document.getElementById('adminModalTitle');
+  const body = document.getElementById('adminModalBody');
+  if (!overlay || !body) return;
+
+  title.innerText = '🍽️ Add New Menu Item';
+  body.innerHTML = `
+    <form onsubmit="handleCreateMenu(event)">
+      <div class="form-group">
+        <label>Select Branch</label>
+        <select id="newMenuBranch" class="form-select" required>
+          ${state.branches.map(b => `<option value="${b.id || b._id}">${b.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Item Name</label>
+        <input type="text" id="newMenuName" class="form-control" required placeholder="e.g. Paneer Butter Masala">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="newMenuCategory" class="form-select" required>
+          <option value="Starters">Starters</option>
+          <option value="Main Course" selected>Main Course</option>
+          <option value="Desserts">Desserts</option>
+          <option value="Beverages">Beverages</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Price (₹)</label>
+        <input type="number" id="newMenuPrice" class="form-control" min="0" step="0.01" value="250.00" required>
+      </div>
+      <div class="form-group">
+        <label>Description (Optional)</label>
+        <input type="text" id="newMenuDescription" class="form-control" placeholder="Short description of dish...">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:0.5rem;margin-top:1.5rem">
+        <button type="button" class="btn btn-secondary" onclick="closeAdminModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Menu Item</button>
+      </div>
+    </form>`;
+
+  overlay.style.display = 'flex';
+}
+
+async function handleCreateMenu(e) {
+  e.preventDefault();
+  const branchId = document.getElementById('newMenuBranch').value;
+  const name = document.getElementById('newMenuName').value.trim();
+  const category = document.getElementById('newMenuCategory').value;
+  const price = Number(document.getElementById('newMenuPrice').value);
+  const description = document.getElementById('newMenuDescription').value.trim();
+
+  try {
+    await authFetch(`${API_BASE}/menu`, {
+      method: 'POST',
+      body: JSON.stringify({ branchId, name, category, price, description })
+    });
+    showToast(`Menu item "${name}" added 🎉`, 'success');
+    closeAdminModal();
+    loadManagerMenu();
   } catch (err) {
     showToast(err.message, 'error');
   }
